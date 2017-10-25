@@ -269,6 +269,45 @@ QGCView {
             }
         }
 
+        //-- Video View 2
+        Item {
+            id:             _flightVideo
+            z:              _mainIsMap ? _panel.z + 2 : _panel.z + 1
+            width:          !_mainIsMap ? _panel.width  : _pipSize
+            height:         !_mainIsMap ? _panel.height : _pipSize * (9/16)
+            anchors.right:   _panel.right
+            anchors.bottom: _panel.bottom
+            visible:        QGroundControl.videoManager.hasVideo && (!_mainIsMap || _isPipVisible)
+            states: [
+                State {
+                    name:   "pipMode"
+                    PropertyChanges {
+                        target: _flightVideo
+                        anchors.margins:    ScreenTools.defaultFontPixelHeight
+                    }
+                },
+                State {
+                    name:   "fullMode"
+                    PropertyChanges {
+                        target: _flightVideo
+                        anchors.margins:    0
+                    }
+                }
+            ]
+            //-- Video Streaming
+            FlightDisplayViewVideo {
+                anchors.fill:   parent
+                visible:        QGroundControl.videoManager.isGStreamer
+            }
+            //-- UVC Video (USB Camera or Video Device)
+            Loader {
+                id:             cameraLoader
+                anchors.fill:   parent
+                visible:        !QGroundControl.videoManager.isGStreamer
+                source:         QGroundControl.videoManager.uvcEnabled ? "qrc:/qml/FlightDisplayViewUVC.qml" : "qrc:/qml/FlightDisplayViewDummy.qml"
+            }
+        }
+
         QGCPipable {
             id:                 _flightVideoPipControl
             z:                  _flightVideo.z + 3
